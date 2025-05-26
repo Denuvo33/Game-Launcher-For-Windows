@@ -5,10 +5,10 @@ part 'game_model.g.dart';
 @HiveType(typeId: 0)
 class GameModel extends HiveObject {
   @HiveField(0)
-  final String path;
+  final String? path;
 
   @HiveField(1)
-  final String name;
+  final String? name;
 
   @HiveField(2)
   final String? iconPath;

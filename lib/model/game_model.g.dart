@@ -17,8 +17,8 @@ class GameModelAdapter extends TypeAdapter<GameModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return GameModel(
-      path: fields[0] as String,
-      name: fields[1] as String,
+      path: fields[0] as String?,
+      name: fields[1] as String?,
       iconPath: fields[2] as String?,
     );
   }
