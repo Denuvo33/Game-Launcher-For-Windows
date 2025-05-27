@@ -4,11 +4,20 @@ import 'package:game_launcher_windows/Screen/home_screen.dart';
 import 'package:game_launcher_windows/bloc/launcher_bloc.dart';
 import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  windowManager.ensureInitialized();
 
+  await windowManager.ensureInitialized();
   windowManager.setMinimumSize(const Size(800, 600));
+
+  WindowOptions windowOptions = WindowOptions(
+    center: true,
+    size: const Size(1200, 800),
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
 
   runApp(BlocProvider(create: (context) => LauncherBloc(), child: MyApp()));
 }
