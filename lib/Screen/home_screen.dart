@@ -29,10 +29,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
             );
-          } else {
-            if (Navigator.canPop(context)) {
-              Navigator.of(context).pop();
-            }
           }
         },
         child: BlocBuilder<LauncherBloc, LauncherState>(
@@ -155,7 +151,7 @@ class HomeScreen extends StatelessWidget {
 
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () {
+        onPressed: () async {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AddGamesScreen()),

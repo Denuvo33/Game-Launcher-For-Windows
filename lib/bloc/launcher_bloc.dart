@@ -87,9 +87,13 @@ class LauncherBloc extends Bloc<LauncherEvent, LauncherState> {
     final game = GameModel(
       name: event.gameName,
       path: state.tempGamePath,
-      iconPath: state.tempIconPath,
+      iconPath:
+          state.tempIconPath == '' || state.tempIconPath == null
+              ? null
+              : state.tempIconPath,
     );
-    emit(state.copyWith(tempGamePath: null, tempIconPath: null));
     add(AddGames(game));
+    await Future.delayed(Duration(milliseconds: 100));
+    emit(state.copyWith(tempGamePath: '', tempIconPath: ''));
   }
 }

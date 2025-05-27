@@ -28,9 +28,14 @@ class _AddGamesScreenState extends State<AddGamesScreen> {
             margin: EdgeInsets.all(10),
             child: SingleChildScrollView(
               child: Column(
+                spacing: 20,
                 children: [
                   ListTile(
-                    title: Text(state.tempGamePath ?? 'Game Path'),
+                    title: Text(
+                      state.tempGamePath == '' || state.tempGamePath == null
+                          ? 'Game Path'
+                          : state.tempGamePath!,
+                    ),
                     trailing: IconButton(
                       onPressed: () {
                         context.read<LauncherBloc>().add(PickGamePath());
@@ -39,7 +44,11 @@ class _AddGamesScreenState extends State<AddGamesScreen> {
                     ),
                   ),
                   ListTile(
-                    title: Text(state.tempIconPath ?? 'Image Path (Optional)'),
+                    title: Text(
+                      state.tempIconPath == '' || state.tempIconPath == null
+                          ? 'Icon Path (Optional)'
+                          : state.tempIconPath ?? 'Icon Path (Optional)',
+                    ),
                     trailing: IconButton(
                       onPressed: () {
                         context.read<LauncherBloc>().add(PickIconPath());
@@ -60,9 +69,14 @@ class _AddGamesScreenState extends State<AddGamesScreen> {
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () {
-                      if (title.text.isEmpty) {
+                      if (title.text.isEmpty && state.tempGamePath == null ||
+                          state.tempGamePath == '') {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please enter game name')),
+                          SnackBar(
+                            content: Text(
+                              'Please enter Game name or Game Path',
+                            ),
+                          ),
                         );
                         return;
                       }
@@ -71,7 +85,6 @@ class _AddGamesScreenState extends State<AddGamesScreen> {
                         PickAndAddGame(title.text),
                       );
                       Navigator.pop(context);
-                      state.copyWith(tempGamePath: null, tempIconPath: null);
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(SnackBar(content: Text('Game Saved')));
