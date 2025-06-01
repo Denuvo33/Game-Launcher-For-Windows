@@ -25,3 +25,13 @@ class PickAndAddGame extends LauncherEvent {
 class PickGamePath extends LauncherEvent {}
 
 class PickIconPath extends LauncherEvent {}
+
+class SearchGame extends LauncherEvent {
+  final String gameName;
+  SearchGame(this.gameName);
+}
+
+class SortGame extends LauncherEvent {
+  final String sort;
+  SortGame(this.sort);
+}

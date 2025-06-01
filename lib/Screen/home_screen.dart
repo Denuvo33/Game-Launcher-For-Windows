@@ -5,7 +5,8 @@ import 'package:game_launcher_windows/Screen/add_games_screen.dart';
 import 'package:game_launcher_windows/bloc/launcher_bloc.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+  final TextEditingController _searchGame = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,6 @@ class HomeScreen extends StatelessWidget {
           if (state.launchGame) {
             showDialog(
               context: context,
-              barrierDismissible: false,
               builder:
                   (_) => const AlertDialog(
                     title: Text('Starting Game'),
@@ -33,13 +33,19 @@ class HomeScreen extends StatelessWidget {
         },
         child: BlocBuilder<LauncherBloc, LauncherState>(
           builder: (context, state) {
-            return state.games.isEmpty
+            return launcherBloc.state.games.isEmpty && _searchGame.text.isEmpty
                 ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     spacing: 10,
                     children: [
-                      Text('You dont have any game'),
+                      Text(
+                        'You dont have any Games😢',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -60,89 +66,141 @@ class HomeScreen extends StatelessWidget {
                 )
                 : SingleChildScrollView(
                   padding: const EdgeInsets.all(12),
-                  child: Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children:
-                        state.games.map((game) {
-                          return GestureDetector(
-                            onTap: () {
-                              launcherBloc.add(LaunchGame(game));
-                            },
-                            child: Card(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 164,
-                                    height: 164,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: Colors.grey[200],
-                                      image:
-                                          game.iconPath != null
-                                              ? DecorationImage(
-                                                image: FileImage(
-                                                  File(game.iconPath!),
-                                                ),
-                                                fit: BoxFit.cover,
-                                              )
-                                              : null,
-                                    ),
-                                    child:
-                                        game.iconPath == null
-                                            ? const Icon(
-                                              Icons.videogame_asset,
-                                              size: 40,
-                                              color: Colors.white,
-                                            )
-                                            : null,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 20,
+                      children: [
+                        SearchBar(
+                          hintText: "Search Game",
+                          controller: _searchGame,
+                          onChanged: (value) {
+                            launcherBloc.add(SearchGame(value));
+                          },
+                        ),
+                        Row(
+                          children: [
+                            PopupMenuButton(
+                              itemBuilder: (context) {
+                                return [
+                                  PopupMenuItem(
+                                    child: Text('Date New'),
+                                    value: 'Date New',
+                                    onTap: () {
+                                      launcherBloc.add(SortGame('Date New'));
+                                    },
                                   ),
-                                  const SizedBox(height: 4),
-                                  SizedBox(
-                                    width: 164,
-                                    child: Text(
-                                      game.name ?? "",
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      textAlign: TextAlign.center,
-                                    ),
+                                  PopupMenuItem(
+                                    child: Text('Date Old'),
+                                    value: 'Date Old',
+                                    onTap: () {
+                                      launcherBloc.add(SortGame('Date Old'));
+                                    },
                                   ),
-                                  SizedBox(
-                                    width: 164,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                  PopupMenuItem(
+                                    child: Text('Name'),
+                                    value: 'Name',
+                                    onTap: () {
+                                      launcherBloc.add(SortGame('Name'));
+                                    },
+                                  ),
+                                ];
+                              },
+                            ),
+                            Text(launcherBloc.state.sort!),
+                          ],
+                        ),
+                        Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children:
+                              state.games.map((game) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    launcherBloc.add(LaunchGame(game));
+                                  },
+                                  child: Card(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            launcherBloc.add(DeleteGame(game));
-                                          },
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
+                                        Container(
+                                          width: 164,
+                                          height: 164,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            color: Colors.grey[200],
+                                            image:
+                                                game.iconPath != null
+                                                    ? DecorationImage(
+                                                      image: FileImage(
+                                                        File(game.iconPath!),
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                    : null,
+                                          ),
+                                          child:
+                                              game.iconPath == null
+                                                  ? const Icon(
+                                                    Icons.videogame_asset,
+                                                    size: 40,
+                                                    color: Colors.white,
+                                                  )
+                                                  : null,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        SizedBox(
+                                          width: 164,
+                                          child: Text(
+                                            game.name ?? "",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
-                                        IconButton(
-                                          onPressed: () {
-                                            context.read<LauncherBloc>().add(
-                                              LaunchGame(game),
-                                            );
-                                          },
-                                          icon: Icon(
-                                            size: 40,
-                                            Icons.play_arrow_rounded,
-                                            color: Colors.green,
+                                        SizedBox(
+                                          width: 164,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  launcherBloc.add(
+                                                    DeleteGame(game),
+                                                  );
+                                                },
+                                                icon: Icon(
+                                                  Icons.delete,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () {
+                                                  context
+                                                      .read<LauncherBloc>()
+                                                      .add(LaunchGame(game));
+                                                },
+                                                icon: Icon(
+                                                  size: 40,
+                                                  Icons.play_arrow_rounded,
+                                                  color: Colors.green,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                                );
+                              }).toList(),
+                        ),
+                      ],
+                    ),
                   ),
                 );
           },
@@ -150,6 +208,7 @@ class HomeScreen extends StatelessWidget {
       ),
 
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
         child: const Icon(Icons.add),
         onPressed: () async {
           Navigator.push(
